@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Bencana PPD Miri</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        #toast {
+            visibility: hidden; min-width: 250px; margin-left: -125px; background-color: #10b981; color: #fff; text-align: center;
+            border-radius: 8px; padding: 16px; position: fixed; z-index: 1; left: 50%; bottom: 30px; opacity: 0;
+            transition: opacity 0.5s, visibility 0.5s; font-weight: 600;
+        }
+        #toast.show { visibility: visible; opacity: 1; }
+        .input-label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563; /* Darker gray for better contrast on light bg */
+        }
+        .input-field, .form-select, .textarea-field {
+            width: 100%;
+            background-color: rgba(243, 244, 246, 0.8);
+            border: 1px solid #d1d5db; /* Gray border */
+            color: #1f2937; /* Dark text color */
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-field:focus, .form-select:focus, .textarea-field:focus {
+            outline: none;
+            border-color: #f59e0b; /* Amber focus */
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+        }
+        .card {
+            background-color: rgba(255, 255, 255, 0.8); /* Lighter, glassy background */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background-color: #f59e0b; /* Amber */
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #fbbf24; /* Lighter Amber */
+            box-shadow: 0 6px 12px rgba(251, 191, 36, 0.3);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background-color: #9ca3af;
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #6b7280;
+            transform: translateY(-2px);
+        }
+        .btn-primary:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-yellow-50 to-gray-100 text-slate-800">
+    <div class="container mx-auto max-w-2xl p-4 sm:p-6 md:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-amber-600 tracking-wide">
+                LAPORAN BENCANA (PPS/BANJIR/RIBUT/TANAH RUNTUH)
+            </h1>
+            <p class="text-amber-600 mt-2 font-semibold">PPD MIRI</p>
+        </header>
+
+        <!-- Dynamic Sections Container -->
+        <div id="app-container">
+            <!-- All sections will be injected here by JS -->
+        </div>
+    </div>
+    
+    <div id="toast"></div>
+
+    <script>
+        // --- CONFIGURATION ---
+        // PENTING: Gantikan URL di bawah dengan URL Web App anda daripada Google Apps Script.
+        const WEB_APP_URL = 'PASTE_YOUR_WEB_APP_URL_HERE';
+
+        // --- DATA ---
+        const schoolData = {
+            "YBB4355": {
+                nama: "SK Sungai Kelabit", kod: "YBB4355", parlimen: "P220", dun: "N76", emel: "ybb4355@moe.edu.my",
+                murid: {keseluruhan: 13, harian: 10, asrama: 0, pra: 3},
+                guru: 8, akp: 1,
+                guruKeluarga: 8,
+                akpKeluarga: 1,
+                pelapor: {nama: "CAROLYNE ANAK JOHN", jawatan: "PK HEM", tel: "0138318225"},
+                pengesah: {nama: "FAZRI BIN SABEH", jawatan: "GURU BESAR", tel: "0109459871"},
+                kawasanTerjejasDefault: "Seluruh kawasan sekolah termasuk pra sekolah dan kuarters guru"
+            },
+            "YBB4301": {
+                nama: "SK Long Terawan", kod: "YBB4301", parlimen: "P220", dun: "N77", emel: "ybb4301@moe.edu.my",
+                murid: {keseluruhan: 50, harian: 20, asrama: 30, pra: 5},
+                guru: 12, akp: 2,
+                guruKeluarga: 12,
+                akpKeluarga: 2,
+                pelapor: {nama: "NAMA PELAPOR SEKOLAH LAIN", jawatan: "PK HEM", tel: "012-3456789"},
+                pengesah: {nama: "NAMA GURU BESAR SEKOLAH LAIN", jawatan: "GURU BESAR", tel: "019-8765432"},
+                kawasanTerjejasDefault: "Padang sekolah dan blok akademik aras bawah"
+            },
+            "YEA4101": {
+                nama: "KOLEJ TUN DATU TUANKU HAJI BUJANG", kod: "YEA4101", parlimen: "P219", dun: "N74", emel: "yea4101@moe.edu.my",
+                murid: {keseluruhan: 800, harian: 100, asrama: 700, pra: 0},
+                guru: 70, akp: 15, guruKeluarga: 70, akpKeluarga: 15,
+                pelapor: {nama: "PENOLONG KANAN HEM", jawatan: "PK HEM", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "PENGETUA", jawatan: "PENGETUA", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YEE4102": {
+                nama: "SMK CHUNG HUA MIRI", kod: "YEE4102", parlimen: "P219", dun: "N74", emel: "yee4102@moe.edu.my",
+                murid: {keseluruhan: 2000, harian: 2000, asrama: 0, pra: 0},
+                guru: 120, akp: 20, guruKeluarga: 120, akpKeluarga: 20,
+                pelapor: {nama: "PENOLONG KANAN HEM", jawatan: "PK HEM", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "PENGETUA", jawatan: "PENGETUA", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YRA4101": {
+                nama: "SMK AGAMA MIRI", kod: "YRA4101", parlimen: "P219", dun: "N75", emel: "yra4101@moe.edu.my",
+                murid: {keseluruhan: 750, harian: 50, asrama: 700, pra: 0},
+                guru: 65, akp: 12, guruKeluarga: 65, akpKeluarga: 12,
+                pelapor: {nama: "PENOLONG KANAN HEM", jawatan: "PK HEM", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "PENGETUA", jawatan: "PENGETUA", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YEA4104": {
+                nama: "SMK LUTONG", kod: "YEA4104", parlimen: "P219", dun: "N73", emel: "yea4104@moe.edu.my",
+                murid: {keseluruhan: 1800, harian: 1800, asrama: 0, pra: 0},
+                guru: 110, akp: 18, guruKeluarga: 110, akpKeluarga: 18,
+                pelapor: {nama: "PENOLONG KANAN HEM", jawatan: "PK HEM", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "PENGETUA", jawatan: "PENGETUA", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YFA4201": {
+                nama: "SM SAINS MIRI", kod: "YFA4201", parlimen: "P219", dun: "N75", emel: "yfa4201@moe.edu.my",
+                murid: {keseluruhan: 600, harian: 0, asrama: 600, pra: 0},
+                guru: 60, akp: 10, guruKeluarga: 60, akpKeluarga: 10,
+                pelapor: {nama: "PENOLONG KANAN HEM", jawatan: "PK HEM", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "PENGETUA", jawatan: "PENGETUA", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+             "YBA4112": {
+                nama: "SK SENADIN", kod: "YBA4112", parlimen: "P219", dun: "N75", emel: "yba4112@moe.edu.my",
+                murid: {keseluruhan: 1500, harian: 1500, asrama: 0, pra: 100},
+                guru: 90, akp: 10, guruKeluarga: 90, akpKeluarga: 10,
+                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YBB4347": {
+                nama: "SK SUNGAI SEPUTI", kod: "YBB4347", parlimen: "P220", dun: "N76", emel: "ybb4347@moe.edu.my",
+                murid: {keseluruhan: 30, harian: 30, asrama: 0, pra: 0},
+                guru: 10, akp: 2, guruKeluarga: 10, akpKeluarga: 2,
+                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YBA4108": {
+                nama: "SK SOUTH", kod: "YBA4108", parlimen: "P219", dun: "N74", emel: "yba4108@moe.edu.my",
+                murid: {keseluruhan: 500, harian: 500, asrama: 0, pra: 50},
+                guru: 40, akp: 5, guruKeluarga: 40, akpKeluarga: 5,
+                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YBB4350": {
+                nama: "SK SG.ENTULANG", kod: "YBB4350", parlimen: "P220", dun: "N76", emel: "ybb4350@moe.edu.my",
+                murid: {keseluruhan: 45, harian: 45, asrama: 0, pra: 0},
+                guru: 11, akp: 2, guruKeluarga: 11, akpKeluarga: 2,
+                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YBC4203": {
+                nama: "SJK TUKAU", kod: "YBC4203", parlimen: "P219", dun: "N75", emel: "ybc4203@moe.edu.my",
+                murid: {keseluruhan: 300, harian: 300, asrama: 0, pra: 0},
+                guru: 25, akp: 4, guruKeluarga: 25, akpKeluarga: 4,
+                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YBA4204": {
+                nama: "SK KAMPUNG BERAYA", kod: "YBA4204", parlimen: "P219", dun: "N72", emel: "yba4204@moe.edu.my",
+                murid: {keseluruhan: 150, harian: 150, asrama: 0, pra: 25},
+                guru: 18, akp: 3, guruKeluarga: 18, akpKeluarga: 3,
+                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YBA4202": {
+                nama: "SK KG.BAKAM", kod: "YBA4202", parlimen: "P219", dun: "N72", emel: "yba4202@moe.edu.my",
+                murid: {keseluruhan: 250, harian: 250, asrama: 0, pra: 25},
+                guru: 22, akp: 4, guruKeluarga: 22, akpKeluarga: 4,
+                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YBB4348": {
+                nama: "SK SG.BURI", kod: "YBB4348", parlimen: "P219", dun: "N72", emel: "ybb4348@moe.edu.my",
+                murid: {keseluruhan: 60, harian: 60, asrama: 0, pra: 0},
+                guru: 12, akp: 2, guruKeluarga: 12, akpKeluarga: 2,
+                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YBA4105": {
+                nama: "SK LUTONG", kod: "YBA4105", parlimen: "P219", dun: "N73", emel: "yba4105@moe.edu.my",
+                murid: {keseluruhan: 1200, harian: 1200, asrama: 0, pra: 100},
+                guru: 80, akp: 10, guruKeluarga: 80, akpKeluarga: 10,
+                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YBB4321": {
+                nama: "SK LEPONG AJAI", kod: "YBB4321", parlimen: "P220", dun: "N77", emel: "ybb4321@moe.edu.my",
+                murid: {keseluruhan: 80, harian: 20, asrama: 60, pra: 15},
+                guru: 13, akp: 3, guruKeluarga: 13, akpKeluarga: 3,
+                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YBC4101": {
+                nama: "SJKC CHUNG HUA MIRI", kod: "YBC4101", parlimen: "P219", dun: "N74", emel: "ybc4101@moe.edu.my",
+                murid: {keseluruhan: 1600, harian: 1600, asrama: 0, pra: 0},
+                guru: 95, akp: 12, guruKeluarga: 95, akpKeluarga: 12,
+                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+             "YBB4352": {
+                nama: "SK SG SELEPIN", kod: "YBB4352", parlimen: "P220", dun: "N76", emel: "ybb4352@moe.edu.my",
+                murid: {keseluruhan: 25, harian: 25, asrama: 0, pra: 0},
+                guru: 9, akp: 2, guruKeluarga: 9, akpKeluarga: 2,
+                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YBC4303": {
+                nama: "SJK HUA KWONG", kod: "YBC4303", parlimen: "P219", dun: "N73", emel: "ybc4303@moe.edu.my",
+                murid: {keseluruhan: 200, harian: 200, asrama: 0, pra: 0},
+                guru: 20, akp: 3, guruKeluarga: 20, akpKeluarga: 3,
+                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            },
+            "YBA4101": {
+                nama: "SK AGAMA MIRI", kod: "YBA4101", parlimen: "P219", dun: "N74", emel: "yba4101@moe.edu.my",
+                murid: {keseluruhan: 600, harian: 600, asrama: 0, pra: 50},
+                guru: 50, akp: 8, guruKeluarga: 50, akpKeluarga: 8,
+                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
+                kawasanTerjejasDefault: "Kawasan sekolah"
+            }
+        };
+        let currentSchoolData = {};
+        
+        // --- UI ELEMENTS & STATE ---
+        const appContainer = document.getElementById('app-container');
+        let currentStep = 'school';
+        let selectedDisasterType = '';
+
+        // --- TEMPLATES --- (A more robust way to handle sections)
+        const templates = {
+            school: `
+                <section id="schoolSelectionSection" class="card">
+                    <h2 class="text-xl font-semibold flex items-center gap-3 mb-6"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500"><path d="M14 22v-4a2 2 0 1 0-4 0v4"/><path d="m18 10 4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"/><path d="M18 5v17"/><path d="m12 3-4 5v12h8V8l-4-5"/><path d="M2 10h20"/><path d="M6 5v17"/></svg>Langkah 1: Pilih Sekolah Anda</h2>
+                    <div>
+                        <label for="schoolSelect" class="input-label">Nama Sekolah</label>
+                        <select id="schoolSelect" class="form-select"></select>
+                    </div>
+                    <div class="pt-6 text-center">
+                        <button id="nextBtn" class="btn-primary w-full md:w-auto">Seterusnya <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+                    </div>
+                </section>`,
+            confirm: `
+                <section id="confirmationSection" class="card">
+                    <h2 class="text-xl font-semibold flex items-center gap-3 mb-6"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>Langkah 2: Sahkan & Kemas Kini Maklumat</h2>
+                    <div id="confirmationForm" class="space-y-6 text-sm"></div>
+                    <div class="pt-6 flex flex-col md:flex-row justify-center gap-4">
+                        <button id="backBtn" class="btn-secondary w-full md:w-auto"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Kembali</button>
+                        <button id="confirmBtn" class="btn-primary w-full md:w-auto">Simpan & Teruskan</button>
+                    </div>
+                </section>`,
+            disaster: `
+                <section id="disasterTypeSection" class="card">
+                     <h2 class="text-xl font-semibold flex items-center gap-3 mb-6"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500"><path d="m13 2-3 14-3 6h12l-3-6-3-14Z"/><path d="M2 22h20"/></svg>Langkah 3: Pilih Jenis Bencana</h2>
+                    <div>
+                        <label for="disasterTypeSelect" class="input-label">Jenis Bencana</label>
+                        <select id="disasterTypeSelect" class="form-select">
+                            <option selected>Banjir</option> <option>Banjir Kilat</option> <option>Tanah Runtuh</option> <option>Ribut</option> <option>Kebakaran</option>
+                        </select>
+                    </div>
+                    <div class="pt-6 flex flex-col md:flex-row justify-center gap-4">
+                        <button id="disasterBackBtn" class="btn-secondary w-full md:w-auto"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Kembali</button>
+                        <button id="disasterNextBtn" class="btn-primary w-full md:w-auto">Seterusnya</button>
+                    </div>
+                </section>`,
+            form: `
+                 <section id="mainFormSection" class="card">
+                     <h2 id="mainFormTitle" class="text-xl font-semibold border-b border-gray-200 pb-4 mb-6">Langkah 4: Isi Laporan Harian</h2>
+                     <div class="space-y-6">
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div><label for="tarikh" class="input-label">Tarikh</label><input type="date" id="tarikh" class="input-field"></div>
+                            <div><label for="masa" class="input-label">Masa</label><input type="time" id="masa" class="input-field"></div>
+                         </div>
+                         <div id="banjirFields">
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-gray-200 pt-6">
+                                 <div><label for="parasAir" class="input-label">Paras Air</label><select id="parasAir" class="form-select"><option>Di bawah 1 kaki</option><option selected>1 kaki</option><option>2 kaki</option><option>3 kaki</option><option>Melebihi 3 kaki</option></select></div>
+                                 <div class="md:col-span-2"><label for="puncaBanjir" class="input-label">Sebab/Punca Banjir</label><input type="text" id="puncaBanjir" value="Hujan lebat berterusan" class="input-field"></div>
+                                 <div class="md:col-span-2"><label for="kawasanTerjejas" class="input-label">Kawasan Terjejas</label><textarea id="kawasanTerjejas" rows="3" class="textarea-field"></textarea></div>
+                                 <div class="md:col-span-2"><label for="kawasanSelamat" class="input-label">Kawasan Tidak Terjejas</label><input type="text" id="kawasanSelamat" value="Jalan masuk utama sekolah" class="input-field"></div>
+                             </div>
+                         </div>
+                         <div id="ributFields" class="hidden">
+                              <div class="md:col-span-2 border-t border-gray-200 pt-6"><label for="kerosakanRibut" class="input-label">Nyatakan jenis kerosakan dan bangunan</label><textarea id="kerosakanRibut" placeholder="Contoh: Atap dewan makan tercabut, cermin tingkap makmal pecah." rows="4" class="textarea-field"></textarea></div>
+                         </div>
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-gray-200 pt-6">
+                             <div><label for="sekolahBeroperasi" class="input-label">Sekolah Beroperasi</label><select id="sekolahBeroperasi" class="form-select"><option>Ya</option><option>Tidak</option></select></div>
+                             <div><label for="statusPdpc" class="input-label">Status PDPC</label><select id="statusPdpc" class="form-select"><option selected>PDPC dijalankan seperti biasa.</option><option>PDPC ditangguhkan atas faktor keselamatan.</option><option>Pengajaran dan Pembelajaran di Rumah (PdPR) dilaksanakan.</option></select></div>
+                             <div class="md:col-span-2"><label for="pusatPemindahan" class="input-label">Sekolah Dijadikan PPS</label><select id="pusatPemindahan" class="form-select"><option>Tidak</option><option>Ya</option></select></div>
+                         </div>
+                     </div>
+                     <div class="pt-8 flex flex-col md:flex-row justify-center gap-4">
+                         <button id="formBackBtn" class="btn-secondary w-full md:w-auto"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Kembali</button>
+                         <button id="generateBtn" class="btn-primary w-full md:w-auto">Hasilkan & Simpan Laporan</button>
+                     </div>
+                 </section>`,
+            output: `
+                <section id="outputSection" class="card">
+                    <h2 class="text-xl font-semibold mb-4">Laporan Sedia Untuk Disalin</h2>
+                    <div class="relative">
+                        <textarea id="reportOutput" rows="20" class="w-full p-4 border bg-slate-50 border-gray-300 rounded-md readonly text-sm font-mono" readonly></textarea>
+                        <button id="copyBtn" class="absolute top-3 right-3 bg-gray-500 hover:bg-amber-500 text-white font-semibold py-1 px-3 rounded-md text-sm transition-colors">Salin</button>
+                    </div>
+                    <div class="pt-6 flex flex-col md:flex-row justify-center gap-4">
+                        <button id="outputBackBtn" class="btn-secondary w-full md:w-auto"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Kembali</button>
+                        <button id="shareTelegramBtn" class="btn-primary w-full md:w-auto bg-[#229ED9] hover:bg-[#1DA7E2]"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13H2l1.9-9.5L22 2zM22 2l-7 20-4-9-1.9-9.5L22 2z"></path></svg> Kongsi ke Telegram</button>
+                    </div>
+                </section>`
+        };
+
+        // --- FUNCTIONS ---
+        const renderStep = (stepName) => {
+            appContainer.innerHTML = templates[stepName];
+            attachEventListeners(stepName);
+            currentStep = stepName;
+        };
+        
+        const showToast = (message, isSuccess = true) => {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.backgroundColor = isSuccess ? '#10b981' : '#ef4444';
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        };
+
+        const attachEventListeners = (stepName) => {
+            if (stepName === 'school') {
+                const schoolSelect = document.getElementById('schoolSelect');
+                // Sort schools alphabetically before adding them to the dropdown
+                const sortedSchools = Object.entries(schoolData).sort(([,a],[,b]) => a.nama.localeCompare(b.nama));
+                
+                sortedSchools.forEach(([key, school]) => {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = school.nama;
+                    schoolSelect.appendChild(option);
+                });
+                document.getElementById('nextBtn').addEventListener('click', handleSchoolSelection);
+            } else if (stepName === 'confirm') {
+                document.getElementById('backBtn').addEventListener('click', () => renderStep('school'));
+                document.getElementById('confirmBtn').addEventListener('click', handleConfirm);
+            } else if (stepName === 'disaster') {
+                document.getElementById('disasterBackBtn').addEventListener('click', () => renderStep('confirm'));
+                document.getElementById('disasterNextBtn').addEventListener('click', handleDisasterSelection);
+            } else if (stepName === 'form') {
+                const now = new Date();
+                document.getElementById('tarikh').value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                document.getElementById('masa').value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                document.getElementById('formBackBtn').addEventListener('click', () => renderStep('disaster'));
+                document.getElementById('generateBtn').addEventListener('click', generateReport);
+            } else if (stepName === 'output') {
+                document.getElementById('copyBtn').addEventListener('click', copyReport);
+                document.getElementById('outputBackBtn').addEventListener('click', () => renderStep('form'));
+                document.getElementById('shareTelegramBtn').addEventListener('click', shareToTelegram);
+            }
+        };
+
+        const getNamaHari = (date) => ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'][date.getDay()];
+        const formatMasa = (time) => {
+            if (!time) return '';
+            const [jam, minit] = time.split(':');
+            const period = parseInt(jam, 10) >= 12 ? 'petang' : 'pagi';
+            const formattedHour = jam.padStart(2, '0');
+            const formattedMinute = minit.padStart(2, '0');
+            return `${formattedHour}${formattedMinute} ${period}`;
+        };
+        
+        const shareToTelegram = () => {
+            const reportText = document.getElementById('reportOutput').value;
+            if (!reportText) return;
+            const maxLength = 4000;
+            let textToShare = reportText;
+            if (textToShare.length > maxLength) {
+                textToShare = textToShare.substring(0, maxLength) + "\n\n[Laporan dipendekkan...]";
+            }
+            const encodedText = encodeURIComponent(textToShare);
+            const telegramUrl = `https://t.me/share/url?text=${encodedText}`;
+            window.open(telegramUrl, '_blank');
+        };
+
+        const handleSchoolSelection = () => {
+            const selectedSchoolKey = document.getElementById('schoolSelect').value;
+            currentSchoolData = JSON.parse(JSON.stringify(schoolData[selectedSchoolKey]));
+            renderStep('confirm');
+            const formDiv = document.getElementById('confirmationForm');
+            formDiv.innerHTML = `
+                <div>
+                    <h3 class="font-semibold text-amber-600 mb-3">Maklumat Murid & Staf</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-black/5 rounded-lg">
+                        <div><label class="input-label" for="confMuridKeseluruhan">Jml Murid</label><input type="number" id="confMuridKeseluruhan" value="${currentSchoolData.murid.keseluruhan}" class="input-field"></div>
+                        <div><label class="input-label" for="confMuridHarian">Harian</label><input type="number" id="confMuridHarian" value="${currentSchoolData.murid.harian}" class="input-field"></div>
+                        <div><label class="input-label" for="confMuridAsrama">Asrama</label><input type="number" id="confMuridAsrama" value="${currentSchoolData.murid.asrama}" class="input-field"></div>
+                        <div><label class="input-label" for="confMuridPra">Prasekolah</label><input type="number" id="confMuridPra" value="${currentSchoolData.murid.pra}" class="input-field"></div>
+                        <div class="col-span-2"><label class="input-label" for="confGuru">Bil. Guru</label><input type="number" id="confGuru" value="${currentSchoolData.guru}" class="input-field"></div>
+                        <div class="col-span-2"><label class="input-label" for="confAkp">Bil. AKP</label><input type="number" id="confAkp" value="${currentSchoolData.akp}" class="input-field"></div>
+                        <div class="col-span-2"><label class="input-label" for="confGuruKeluarga">Bil. Guru & Keluarga</label><input type="number" id="confGuruKeluarga" value="${currentSchoolData.guruKeluarga}" class="input-field"></div>
+                        <div class="col-span-2"><label class="input-label" for="confAkpKeluarga">Bil. AKP & Keluarga</label><input type="number" id="confAkpKeluarga" value="${currentSchoolData.akpKeluarga}" class="input-field"></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-amber-600 mb-3">Maklumat Pelapor</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-black/5 rounded-lg">
+                        <div class="md:col-span-3"><label class="input-label" for="confPelaporNama">Nama</label><input type="text" id="confPelaporNama" value="${currentSchoolData.pelapor.nama}" class="input-field"></div>
+                        <div><label class="input-label" for="confPelaporJawatan">Jawatan</label><input type="text" id="confPelaporJawatan" value="${currentSchoolData.pelapor.jawatan}" class="input-field"></div>
+                        <div class="md:col-span-2"><label class="input-label" for="confPelaporTel">No. Tel.</label><input type="text" id="confPelaporTel" value="${currentSchoolData.pelapor.tel}" class="input-field"></div>
+                    </div>
+                </div>
+                 <div>
+                    <h3 class="font-semibold text-amber-600 mb-3">Maklumat Pengesah</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-black/5 rounded-lg">
+                        <div class="md:col-span-3"><label class="input-label" for="confPengesahNama">Nama</label><input type="text" id="confPengesahNama" value="${currentSchoolData.pengesah.nama}" class="input-field"></div>
+                        <div><label class="input-label" for="confPengesahJawatan">Jawatan</label><input type="text" id="confPengesahJawatan" value="${currentSchoolData.pengesah.jawatan}" class="input-field"></div>
+                        <div class="md:col-span-2"><label class="input-label" for="confPengesahTel">No. Tel.</label><input type="text" id="confPengesahTel" value="${currentSchoolData.pengesah.tel}" class="input-field"></div>
+                    </div>
+                </div>`;
+        };
+
+        const handleConfirm = () => {
+            currentSchoolData.murid.keseluruhan = document.getElementById('confMuridKeseluruhan').value;
+            currentSchoolData.murid.harian = document.getElementById('confMuridHarian').value;
+            currentSchoolData.murid.asrama = document.getElementById('confMuridAsrama').value;
+            currentSchoolData.murid.pra = document.getElementById('confMuridPra').value;
+            currentSchoolData.guru = document.getElementById('confGuru').value;
+            currentSchoolData.akp = document.getElementById('confAkp').value;
+            currentSchoolData.guruKeluarga = document.getElementById('confGuruKeluarga').value;
+            currentSchoolData.akpKeluarga = document.getElementById('confAkpKeluarga').value;
+            currentSchoolData.pelapor.nama = document.getElementById('confPelaporNama').value;
+            currentSchoolData.pelapor.jawatan = document.getElementById('confPelaporJawatan').value;
+            currentSchoolData.pelapor.tel = document.getElementById('confPelaporTel').value;
+            currentSchoolData.pengesah.nama = document.getElementById('confPengesahNama').value;
+            currentSchoolData.pengesah.jawatan = document.getElementById('confPengesahJawatan').value;
+            currentSchoolData.pengesah.tel = document.getElementById('confPengesahTel').value;
+            renderStep('disaster');
+        };
+
+        const handleDisasterSelection = () => {
+            selectedDisasterType = document.getElementById('disasterTypeSelect').value;
+            renderStep('form');
+            
+            const banjirFields = document.getElementById('banjirFields');
+            const ributFields = document.getElementById('ributFields');
+            const mainFormTitle = document.getElementById('mainFormTitle');
+
+            mainFormTitle.textContent = `Langkah 4: Isi Laporan ${selectedDisasterType}`;
+            document.getElementById('kawasanTerjejas').value = currentSchoolData.kawasanTerjejasDefault;
+
+            if (selectedDisasterType === 'Ribut') {
+                banjirFields.classList.add('hidden');
+                ributFields.classList.remove('hidden');
+            } else {
+                banjirFields.classList.remove('hidden');
+                ributFields.classList.add('hidden');
+            }
+        };
+
+        const saveDataToSheet = (data) => {
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Menyimpan...';
+
+            // Check if the URL has been replaced
+            if (WEB_APP_URL === 'PASTE_YOUR_WEB_APP_URL_HERE') {
+                console.error("Sila masukkan URL Web App anda di dalam pembolehubah WEB_APP_URL.");
+                showToast("Ralat: Sila konfigurasikan URL Web App anda.", false);
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Hasilkan & Simpan Laporan';
+                return;
+            }
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Important for simple deployment
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                showToast('Laporan berjaya disimpan ke Google Sheet!');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Gagal menyimpan laporan. Sila periksa konsol.', false);
+            })
+            .finally(() => {
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Hasilkan & Simpan Laporan';
+            });
+        };
+
+        const generateReport = () => {
+            const school = currentSchoolData;
+            const tarikhInput = document.getElementById('tarikh').value;
+            const masaInput = document.getElementById('masa').value;
+            const tarikhObj = new Date(tarikhInput + 'T00:00:00');
+            
+            const reportData = {
+                tarikhFormatted: `${tarikhInput.split('-').reverse().join('/')} (${getNamaHari(tarikhObj)})`,
+                masaFormatted: formatMasa(masaInput),
+                sekolahBeroperasi: document.getElementById('sekolahBeroperasi').value,
+                statusPdpc: document.getElementById('statusPdpc').value,
+                jenisBencana: selectedDisasterType,
+                pusatPemindahan: document.getElementById('pusatPemindahan').value
+            };
+            
+            let rumusanText = '';
+            let disasterDetails = {};
+
+            if (reportData.jenisBencana === 'Ribut') {
+                const kerosakan = document.getElementById('kerosakanRibut').value || '(Tiada kerosakan dinyatakan)';
+                disasterDetails = { kerosakanRibut: kerosakan, parasAir: '', puncaBanjir: '', kawasanTerjejas: '', kawasanSelamat: '' };
+                rumusanText = `
+9.  RUMUSAN :
+9.1 Ribut menyebabkan kerosakan infrastruktur sekolah berikut
+- ${kerosakan}
+9.2 Sekolah beroperasi / tidak : ${reportData.sekolahBeroperasi}`.trim();
+            } else { // For Banjir, Banjir Kilat, etc.
+                 const parasAir = document.getElementById('parasAir').value;
+                 const puncaBanjir = document.getElementById('puncaBanjir').value;
+                 const kawasanTerjejas = document.getElementById('kawasanTerjejas').value;
+                 const kawasanSelamat = document.getElementById('kawasanSelamat').value;
+                 disasterDetails = { kerosakanRibut: '', parasAir, puncaBanjir, kawasanTerjejas, kawasanSelamat };
+                 rumusanText = `
+9.  RUMUSAN :
+9.1 Sekolah Beroperasi : ${reportData.sekolahBeroperasi}
+9.2 Sebab/Punca Bencana : ${puncaBanjir}
+9.3 Situasi/Keadaan :
+- Paras air : ${parasAir}
+- kawasan yang terjejas : ${kawasanTerjejas}
+- kawasan yang tidak terjejas : ${kawasanSelamat}
+9.4 Status PDPC : ${reportData.statusPdpc}`.trim();
+            }
+
+            const reportText = `
+LAPORAN BENCANA ${reportData.jenisBencana.toUpperCase()}
+
+1.  PPD : Miri
+
+2.  MAKLUMAT ASAS SEKOLAH
+•   NAMA SEKOLAAH : ${school.nama}
+•   KOD SEKOLAH : ${school.kod}
+•   PARLIMEN : ${school.parlimen}
+•   DUN           : ${school.dun}
+•   E-MAIL RASMI : ${school.emel}
+
+•   TARIKH/HARI : ${reportData.tarikhFormatted}
+•   MASA : ${reportData.masaFormatted}
+
+3.  BIL. MURID KESELURUHAN : ${school.murid.keseluruhan}
+•   BIL MURID HARIAN : ${school.murid.harian}
+•   BIL MURID ASRAMA : ${school.murid.asrama}
+•   BIL MURID PRA : ${school.murid.pra}
+
+4.  BIL GURU : ${school.guru}
+
+5.  BIL AKP : ${school.akp}
+
+6.  BIL GURU & AHLI KELUARGA : ${school.guruKeluarga}
+
+7.  BIL AKP & AHLI KELUARGA : ${school.akpKeluarga}
+
+8.  JENIS Bencana : ${reportData.jenisBencana}
+
+${rumusanText}
+
+SEKOLAH DIJADIKAN PUSAT PEMINDAHAN SEMENTARA : ${reportData.pusatPemindahan}
+
+NAMA PELAPOR : ${school.pelapor.nama}
+JAWATAN : ${school.pelapor.jawatan}
+NO. TELEFON BIMBIT : ${school.pelapor.tel}
+
+DISAHKAN OLEH :
+NAMA : ${school.pengesah.nama}
+JAWATAN : ${school.pengesah.jawatan}
+NO HP : ${school.pengesah.tel}
+
+⚠️BERSERTA GAMBAR SEKURANG-KURANGNYA 4 KEPING
+            `.trim();
+
+            // Prepare data for Google Sheet
+            const sheetData = {
+                timestamp: new Date().toISOString(),
+                namaSekolah: school.nama,
+                kodSekolah: school.kod,
+                parlimen: school.parlimen,
+                dun: school.dun,
+                email: school.emel,
+                tarikh: tarikhInput,
+                masa: masaInput,
+                muridKeseluruhan: school.murid.keseluruhan,
+                muridHarian: school.murid.harian,
+                muridAsrama: school.murid.asrama,
+                muridPra: school.murid.pra,
+                bilGuru: school.guru,
+                bilAkp: school.akp,
+                bilGuruKeluarga: school.guruKeluarga,
+                bilAkpKeluarga: school.akpKeluarga,
+                jenisBencana: reportData.jenisBencana,
+                parasAir: disasterDetails.parasAir,
+                puncaBanjir: disasterDetails.puncaBanjir,
+                kawasanTerjejas: disasterDetails.kawasanTerjejas,
+                kawasanSelamat: disasterDetails.kawasanSelamat,
+                kerosakanRibut: disasterDetails.kerosakanRibut,
+                sekolahBeroperasi: reportData.sekolahBeroperasi,
+                statusPdpc: reportData.statusPdpc,
+                dijadikanPps: reportData.pusatPemindahan,
+                namaPelapor: school.pelapor.nama,
+                jawatanPelapor: school.pelapor.jawatan,
+                telPelapor: school.pelapor.tel,
+                namaPengesah: school.pengesah.nama,
+                jawatanPengesah: school.pengesah.jawatan,
+                telPengesah: school.pengesah.tel,
+                laporanPenuh: reportText
+            };
+
+            saveDataToSheet(sheetData);
+
+            renderStep('output');
+            document.getElementById('reportOutput').value = reportText;
+            document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+        };
+        
+        const copyReport = () => {
+            document.getElementById('reportOutput').select();
+            document.execCommand('copy');
+            showToast('Laporan berjaya disalin!');
+        };
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStep('school');
+        });
+    </script>
+</body>
+</html>
+
