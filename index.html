@@ -23,7 +23,7 @@
         }
         #toast {
             visibility: hidden; min-width: 250px; margin-left: -125px; background-color: #10b981; color: #fff; text-align: center;
-            border-radius: 8px; padding: 16px; position: fixed; z-index: 1; left: 50%; bottom: 30px; opacity: 0;
+            border-radius: 8px; padding: 16px; position: fixed; z-index: 100; left: 50%; bottom: 30px; opacity: 0;
             transition: opacity 0.5s, visibility 0.5s; font-weight: 600;
         }
         #toast.show { visibility: visible; opacity: 1; }
@@ -119,8 +119,7 @@
 
     <script>
         // --- CONFIGURATION ---
-        // PENTING: Gantikan URL di bawah dengan URL Web App anda daripada Google Apps Script.
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx8qj0TQ5fu_GFOx-rCN3x53oW1zUITXOxvwbjcuR43w0pS3-aaefqNbKOnplFc6bH5/exec';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxZDW6cZsfI9gp7G-6g-PKXR1l5TL3VK7Yns7xV9RJ9nCprhFcq1BrK2TaeqVk7TT0/exec';
 
         // --- DATA ---
         const schoolData = {
@@ -396,7 +395,7 @@
             toast.textContent = message;
             toast.style.backgroundColor = isSuccess ? '#10b981' : '#ef4444';
             toast.className = "show";
-            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 4000);
         };
 
         const attachEventListeners = (stepName) => {
@@ -454,10 +453,60 @@
             window.open(telegramUrl, '_blank');
         };
 
-        const handleSchoolSelection = () => {
+        const handleSchoolSelection = async () => {
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = true;
+            nextBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Memuatkan...`;
+
             const selectedSchoolKey = document.getElementById('schoolSelect').value;
-            currentSchoolData = JSON.parse(JSON.stringify(schoolData[selectedSchoolKey]));
+            const selectedSchoolName = schoolData[selectedSchoolKey].nama;
+
+            // Start with the default static data from the configuration
+            let dataToDisplay = JSON.parse(JSON.stringify(schoolData[selectedSchoolKey]));
+
+            try {
+                const response = await fetch(`${WEB_APP_URL}?schoolName=${encodeURIComponent(selectedSchoolName)}`);
+                const result = await response.json();
+
+                if (result.status === 'success' && result.data) {
+                    console.log("Latest data fetched from sheet:", result.data);
+                    const latestData = result.data;
+                    
+                    // Overwrite default data with the latest data from the sheet if it exists
+                    dataToDisplay.murid.keseluruhan = latestData['Jum Murid'] || dataToDisplay.murid.keseluruhan;
+                    dataToDisplay.murid.harian = latestData['Murid Harian'] || dataToDisplay.murid.harian;
+                    dataToDisplay.murid.asrama = latestData['Murid Asrama'] || dataToDisplay.murid.asrama;
+                    dataToDisplay.murid.pra = latestData['Murid Pra'] || dataToDisplay.murid.pra;
+                    dataToDisplay.guru = latestData['Bil Guru'] || dataToDisplay.guru;
+                    dataToDisplay.akp = latestData['Bil AKP'] || dataToDisplay.akp;
+                    dataToDisplay.guruKeluarga = latestData['Bil Guru & Keluarga'] || dataToDisplay.guruKeluarga;
+                    dataToDisplay.akpKeluarga = latestData['Bil AKP & Keluarga'] || dataToDisplay.akpKeluarga;
+                    dataToDisplay.pelapor.nama = latestData['Nama Pelapor'] || dataToDisplay.pelapor.nama;
+                    dataToDisplay.pelapor.jawatan = latestData['Jawatan Pelapor'] || dataToDisplay.pelapor.jawatan;
+                    dataToDisplay.pelapor.tel = latestData['Tel Pelapor'] || dataToDisplay.pelapor.tel;
+                    dataToDisplay.pengesah.nama = latestData['Nama Pengesah'] || dataToDisplay.pengesah.nama;
+                    dataToDisplay.pengesah.jawatan = latestData['Jawatan Pengesah'] || dataToDisplay.pengesah.jawatan;
+                    dataToDisplay.pengesah.tel = latestData['Tel Pengesah'] || dataToDisplay.pengesah.tel;
+
+                    showToast('Data terkini berjaya dimuatkan dari rekod.');
+                } else {
+                    console.log("No previous data found, using default data.", result.message);
+                    showToast('Tiada rekod lama ditemui, data lalai digunakan.', true);
+                }
+            } catch (error) {
+                console.error("Failed to fetch latest data:", error);
+                showToast('Gagal memuatkan data terkini, menggunakan data lalai.', false);
+            }
+
+            currentSchoolData = dataToDisplay;
             renderStep('confirm');
+            
+            // Now populate the confirmation form with the (potentially updated) data
             const formDiv = document.getElementById('confirmationForm');
             formDiv.innerHTML = `
                 <div>
@@ -490,6 +539,7 @@
                     </div>
                 </div>`;
         };
+
 
         const handleConfirm = () => {
             currentSchoolData.murid.keseluruhan = document.getElementById('confMuridKeseluruhan').value;
@@ -534,7 +584,6 @@
             generateBtn.disabled = true;
             generateBtn.textContent = 'Menyimpan...';
 
-            // Check if the URL has been replaced
             if (WEB_APP_URL === 'PASTE_YOUR_WEB_APP_URL_HERE') {
                 console.error("Sila masukkan URL Web App anda di dalam pembolehubah WEB_APP_URL.");
                 showToast("Ralat: Sila konfigurasikan URL Web App anda.", false);
@@ -545,17 +594,22 @@
 
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Important for simple deployment
                 cache: 'no-cache',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', }, 
+                body: new URLSearchParams(data).toString()
             })
-            .then(() => {
-                showToast('Laporan berjaya disimpan ke Google Sheet!');
+            .then(response => response.json()) 
+            .then(result => {
+                console.log('Success:', result);
+                if(result.status === 'success') {
+                    showToast('Laporan berjaya disimpan ke Google Sheet!');
+                } else {
+                    showToast(`Gagal menyimpan: ${result.message}`, false);
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showToast('Gagal menyimpan laporan. Sila periksa konsol.', false);
+                showToast('Gagal menyimpan laporan. Sila periksa konsol untuk ralat.', false);
             })
             .finally(() => {
                 generateBtn.disabled = false;
