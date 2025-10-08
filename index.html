@@ -98,6 +98,18 @@
             transform: none;
             box-shadow: none;
         }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #f59e0b;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-yellow-50 to-gray-100 text-slate-800">
@@ -111,10 +123,22 @@
 
         <!-- Dynamic Sections Container -->
         <div id="app-container">
-            <!-- All sections will be injected here by JS -->
+             <div class="flex flex-col items-center justify-center p-10 card">
+                <div class="loader"></div>
+                <p class="mt-4 text-gray-600 font-semibold">Memuatkan senarai sekolah...</p>
+            </div>
         </div>
     </div>
     
+    <footer class="text-center p-4 mt-8 text-sm text-gray-500">
+        <p>
+            Dibangunkan oleh <a href="https://pahanmy.github.io/works/" target="_blank" rel="noopener noreferrer" class="text-amber-600 hover:underline font-semibold">Pahan</a>
+        </p>
+        <p class="mt-1">
+            Versi 1.1 (2025)
+        </p>
+    </footer>
+
     <div id="toast"></div>
 
     <script>
@@ -122,178 +146,16 @@
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyA6y5R9i8meaKb6ge1xGK8TcTHGnJQKehqOoXeijmhLuXhzqKsoKaMj1JiqdGFrq4s/exec';
 
         // --- DATA ---
-        const schoolData = {
-            "YBB4355": {
-                nama: "SK Sungai Kelabit", kod: "YBB4355", parlimen: "P220", dun: "N76", emel: "ybb4355@moe.edu.my",
-                murid: {keseluruhan: 13, harian: 10, asrama: 0, pra: 3},
-                guru: 8, akp: 1,
-                guruKeluarga: 8,
-                akpKeluarga: 1,
-                pelapor: {nama: "CAROLYNE ANAK JOHN", jawatan: "PK HEM", tel: "0138318225"},
-                pengesah: {nama: "FAZRI BIN SABEH", jawatan: "GURU BESAR", tel: "0109459871"},
-                kawasanTerjejasDefault: "Seluruh kawasan sekolah termasuk pra sekolah dan kuarters guru"
-            },
-            "YBB4301": {
-                nama: "SK Long Terawan", kod: "YBB4301", parlimen: "P220", dun: "N77", emel: "ybb4301@moe.edu.my",
-                murid: {keseluruhan: 50, harian: 20, asrama: 30, pra: 5},
-                guru: 12, akp: 2,
-                guruKeluarga: 12,
-                akpKeluarga: 2,
-                pelapor: {nama: "NAMA PELAPOR SEKOLAH LAIN", jawatan: "PK HEM", tel: "012-3456789"},
-                pengesah: {nama: "NAMA GURU BESAR SEKOLAH LAIN", jawatan: "GURU BESAR", tel: "019-8765432"},
-                kawasanTerjejasDefault: "Padang sekolah dan blok akademik aras bawah"
-            },
-            "YEA4101": {
-                nama: "KOLEJ TUN DATU TUANKU HAJI BUJANG", kod: "YEA4101", parlimen: "P219", dun: "N74", emel: "yea4101@moe.edu.my",
-                murid: {keseluruhan: 800, harian: 100, asrama: 700, pra: 0},
-                guru: 70, akp: 15, guruKeluarga: 70, akpKeluarga: 15,
-                pelapor: {nama: "PENOLONG KANAN HEM", jawatan: "PK HEM", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "PENGETUA", jawatan: "PENGETUA", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YEE4102": {
-                nama: "SMK CHUNG HUA MIRI", kod: "YEE4102", parlimen: "P219", dun: "N74", emel: "yee4102@moe.edu.my",
-                murid: {keseluruhan: 2000, harian: 2000, asrama: 0, pra: 0},
-                guru: 120, akp: 20, guruKeluarga: 120, akpKeluarga: 20,
-                pelapor: {nama: "PENOLONG KANAN HEM", jawatan: "PK HEM", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "PENGETUA", jawatan: "PENGETUA", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YRA4101": {
-                nama: "SMK AGAMA MIRI", kod: "YRA4101", parlimen: "P219", dun: "N75", emel: "yra4101@moe.edu.my",
-                murid: {keseluruhan: 750, harian: 50, asrama: 700, pra: 0},
-                guru: 65, akp: 12, guruKeluarga: 65, akpKeluarga: 12,
-                pelapor: {nama: "PENOLONG KANAN HEM", jawatan: "PK HEM", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "PENGETUA", jawatan: "PENGETUA", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YEA4104": {
-                nama: "SMK LUTONG", kod: "YEA4104", parlimen: "P219", dun: "N73", emel: "yea4104@moe.edu.my",
-                murid: {keseluruhan: 1800, harian: 1800, asrama: 0, pra: 0},
-                guru: 110, akp: 18, guruKeluarga: 110, akpKeluarga: 18,
-                pelapor: {nama: "PENOLONG KANAN HEM", jawatan: "PK HEM", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "PENGETUA", jawatan: "PENGETUA", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YFA4201": {
-                nama: "SM SAINS MIRI", kod: "YFA4201", parlimen: "P219", dun: "N75", emel: "yfa4201@moe.edu.my",
-                murid: {keseluruhan: 600, harian: 0, asrama: 600, pra: 0},
-                guru: 60, akp: 10, guruKeluarga: 60, akpKeluarga: 10,
-                pelapor: {nama: "PENOLONG KANAN HEM", jawatan: "PK HEM", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "PENGETUA", jawatan: "PENGETUA", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-             "YBA4112": {
-                nama: "SK SENADIN", kod: "YBA4112", parlimen: "P219", dun: "N75", emel: "yba4112@moe.edu.my",
-                murid: {keseluruhan: 1500, harian: 1500, asrama: 0, pra: 100},
-                guru: 90, akp: 10, guruKeluarga: 90, akpKeluarga: 10,
-                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YBB4347": {
-                nama: "SK SUNGAI SEPUTI", kod: "YBB4347", parlimen: "P220", dun: "N76", emel: "ybb4347@moe.edu.my",
-                murid: {keseluruhan: 30, harian: 30, asrama: 0, pra: 0},
-                guru: 10, akp: 2, guruKeluarga: 10, akpKeluarga: 2,
-                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YBA4108": {
-                nama: "SK SOUTH", kod: "YBA4108", parlimen: "P219", dun: "N74", emel: "yba4108@moe.edu.my",
-                murid: {keseluruhan: 500, harian: 500, asrama: 0, pra: 50},
-                guru: 40, akp: 5, guruKeluarga: 40, akpKeluarga: 5,
-                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YBB4350": {
-                nama: "SK SG.ENTULANG", kod: "YBB4350", parlimen: "P220", dun: "N76", emel: "ybb4350@moe.edu.my",
-                murid: {keseluruhan: 45, harian: 45, asrama: 0, pra: 0},
-                guru: 11, akp: 2, guruKeluarga: 11, akpKeluarga: 2,
-                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YBC4203": {
-                nama: "SJK TUKAU", kod: "YBC4203", parlimen: "P219", dun: "N75", emel: "ybc4203@moe.edu.my",
-                murid: {keseluruhan: 300, harian: 300, asrama: 0, pra: 0},
-                guru: 25, akp: 4, guruKeluarga: 25, akpKeluarga: 4,
-                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YBA4204": {
-                nama: "SK KAMPUNG BERAYA", kod: "YBA4204", parlimen: "P219", dun: "N72", emel: "yba4204@moe.edu.my",
-                murid: {keseluruhan: 150, harian: 150, asrama: 0, pra: 25},
-                guru: 18, akp: 3, guruKeluarga: 18, akpKeluarga: 3,
-                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YBA4202": {
-                nama: "SK KG.BAKAM", kod: "YBA4202", parlimen: "P219", dun: "N72", emel: "yba4202@moe.edu.my",
-                murid: {keseluruhan: 250, harian: 250, asrama: 0, pra: 25},
-                guru: 22, akp: 4, guruKeluarga: 22, akpKeluarga: 4,
-                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YBB4348": {
-                nama: "SK SG.BURI", kod: "YBB4348", parlimen: "P219", dun: "N72", emel: "ybb4348@moe.edu.my",
-                murid: {keseluruhan: 60, harian: 60, asrama: 0, pra: 0},
-                guru: 12, akp: 2, guruKeluarga: 12, akpKeluarga: 2,
-                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YBA4105": {
-                nama: "SK LUTONG", kod: "YBA4105", parlimen: "P219", dun: "N73", emel: "yba4105@moe.edu.my",
-                murid: {keseluruhan: 1200, harian: 1200, asrama: 0, pra: 100},
-                guru: 80, akp: 10, guruKeluarga: 80, akpKeluarga: 10,
-                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YBB4321": {
-                nama: "SK LEPONG AJAI", kod: "YBB4321", parlimen: "P220", dun: "N77", emel: "ybb4321@moe.edu.my",
-                murid: {keseluruhan: 80, harian: 20, asrama: 60, pra: 15},
-                guru: 13, akp: 3, guruKeluarga: 13, akpKeluarga: 3,
-                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YBC4101": {
-                nama: "SJKC CHUNG HUA MIRI", kod: "YBC4101", parlimen: "P219", dun: "N74", emel: "ybc4101@moe.edu.my",
-                murid: {keseluruhan: 1600, harian: 1600, asrama: 0, pra: 0},
-                guru: 95, akp: 12, guruKeluarga: 95, akpKeluarga: 12,
-                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-             "YBB4352": {
-                nama: "SK SG SELEPIN", kod: "YBB4352", parlimen: "P220", dun: "N76", emel: "ybb4352@moe.edu.my",
-                murid: {keseluruhan: 25, harian: 25, asrama: 0, pra: 0},
-                guru: 9, akp: 2, guruKeluarga: 9, akpKeluarga: 2,
-                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YBC4303": {
-                nama: "SJK HUA KWONG", kod: "YBC4303", parlimen: "P219", dun: "N73", emel: "ybc4303@moe.edu.my",
-                murid: {keseluruhan: 200, harian: 200, asrama: 0, pra: 0},
-                guru: 20, akp: 3, guruKeluarga: 20, akpKeluarga: 3,
-                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
-            },
-            "YBA4101": {
-                nama: "SK AGAMA MIRI", kod: "YBA4101", parlimen: "P219", dun: "N74", emel: "yba4101@moe.edu.my",
-                murid: {keseluruhan: 600, harian: 600, asrama: 0, pra: 50},
-                guru: 50, akp: 8, guruKeluarga: 50, akpKeluarga: 8,
-                pelapor: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                pengesah: {nama: "GURU BESAR", jawatan: "GURU BESAR", tel: "01X-XXXXXXX"},
-                kawasanTerjejasDefault: "Kawasan sekolah"
+        let schoolData = {
+             "_NEW_SCHOOL_": {
+                nama: "SEKOLAH BARU (SILA EDIT)", kod: "", parlimen: "", dun: "", emel: "",
+                murid: {keseluruhan: 0, harian: 0, asrama: 0, pra: 0},
+                guru: 0, akp: 0,
+                guruKeluarga: 0,
+                akpKeluarga: 0,
+                pelapor: {nama: "", jawatan: "", tel: ""},
+                pengesah: {nama: "", jawatan: "", tel: ""},
+                kawasanTerjejasDefault: ""
             }
         };
         let currentSchoolData = {};
@@ -303,7 +165,7 @@
         let currentStep = 'school';
         let selectedDisasterType = '';
 
-        // --- TEMPLATES --- (A more robust way to handle sections)
+        // --- TEMPLATES ---
         const templates = {
             school: `
                 <section id="schoolSelectionSection" class="card">
@@ -311,6 +173,10 @@
                     <div>
                         <label for="schoolSelect" class="input-label">Nama Sekolah</label>
                         <select id="schoolSelect" class="form-select"></select>
+                    </div>
+                    <div id="newSchoolInputContainer" class="hidden mt-4">
+                        <label for="newSchoolName" class="input-label">Sila Masukkan Nama Sekolah Baru</label>
+                        <input type="text" id="newSchoolName" class="input-field" placeholder="Contoh: SK MIRI BARU">
                     </div>
                     <div class="pt-6 text-center">
                         <button id="nextBtn" class="btn-primary w-full md:w-auto">Seterusnya <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
@@ -401,8 +267,20 @@
         const attachEventListeners = (stepName) => {
             if (stepName === 'school') {
                 const schoolSelect = document.getElementById('schoolSelect');
-                // Sort schools alphabetically before adding them to the dropdown
-                const sortedSchools = Object.entries(schoolData).sort(([,a],[,b]) => a.nama.localeCompare(b.nama));
+
+                const defaultOption = document.createElement('option');
+                defaultOption.value = "";
+                defaultOption.textContent = "--- Sila Pilih Sekolah Dari Senarai ---";
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                schoolSelect.appendChild(defaultOption);
+                
+                const newSchoolOption = document.createElement('option');
+                newSchoolOption.value = "_NEW_SCHOOL_";
+                newSchoolOption.textContent = "--> SEKOLAH BARU ATAU TIADA DALAM SENARAI <--";
+                schoolSelect.appendChild(newSchoolOption);
+
+                const sortedSchools = Object.entries(schoolData).filter(([key]) => key !== '_NEW_SCHOOL_').sort(([,a],[,b]) => a.nama.localeCompare(b.nama));
                 
                 sortedSchools.forEach(([key, school]) => {
                     const option = document.createElement('option');
@@ -410,6 +288,16 @@
                     option.textContent = school.nama;
                     schoolSelect.appendChild(option);
                 });
+                
+                schoolSelect.addEventListener('change', (e) => {
+                    const newSchoolContainer = document.getElementById('newSchoolInputContainer');
+                    if (e.target.value === '_NEW_SCHOOL_') {
+                        newSchoolContainer.classList.remove('hidden');
+                    } else {
+                        newSchoolContainer.classList.add('hidden');
+                    }
+                });
+
                 document.getElementById('nextBtn').addEventListener('click', handleSchoolSelection);
             } else if (stepName === 'confirm') {
                 document.getElementById('backBtn').addEventListener('click', () => renderStep('school'));
@@ -455,6 +343,13 @@
 
         const handleSchoolSelection = async () => {
             const nextBtn = document.getElementById('nextBtn');
+            const schoolSelect = document.getElementById('schoolSelect');
+
+            if (!schoolSelect.value) {
+                showToast('Sila pilih sekolah terlebih dahulu.', false);
+                return;
+            }
+
             nextBtn.disabled = true;
             nextBtn.innerHTML = `
                 <svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -462,12 +357,28 @@
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 Memuatkan...`;
+            
+            const originalButtonText = `Seterusnya <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`;
 
-            const selectedSchoolKey = document.getElementById('schoolSelect').value;
-            const selectedSchoolName = schoolData[selectedSchoolKey].nama;
-
-            // Start with the default static data from the configuration
-            let dataToDisplay = JSON.parse(JSON.stringify(schoolData[selectedSchoolKey]));
+            const selectedSchoolKey = schoolSelect.value;
+            let dataToDisplay;
+            let selectedSchoolName = '';
+            
+            if (selectedSchoolKey === '_NEW_SCHOOL_') {
+                const newSchoolName = document.getElementById('newSchoolName').value.trim();
+                if (!newSchoolName) {
+                    showToast('Sila masukkan nama sekolah baru.', false);
+                    nextBtn.disabled = false;
+                    nextBtn.innerHTML = originalButtonText;
+                    return;
+                }
+                dataToDisplay = JSON.parse(JSON.stringify(schoolData["_NEW_SCHOOL_"]));
+                dataToDisplay.nama = newSchoolName.toUpperCase();
+                selectedSchoolName = dataToDisplay.nama;
+            } else {
+                 dataToDisplay = JSON.parse(JSON.stringify(schoolData[selectedSchoolKey]));
+                 selectedSchoolName = schoolData[selectedSchoolKey].nama;
+            }
 
             try {
                 const response = await fetch(`${WEB_APP_URL}?schoolName=${encodeURIComponent(selectedSchoolName)}`);
@@ -477,7 +388,6 @@
                     console.log("Latest data fetched from sheet:", result.data);
                     const latestData = result.data;
                     
-                    // Overwrite default data with the latest data from the sheet if it exists
                     dataToDisplay.murid.keseluruhan = latestData['Jum Murid'] || dataToDisplay.murid.keseluruhan;
                     dataToDisplay.murid.harian = latestData['Murid Harian'] || dataToDisplay.murid.harian;
                     dataToDisplay.murid.asrama = latestData['Murid Asrama'] || dataToDisplay.murid.asrama;
@@ -496,7 +406,9 @@
                     showToast('Data terkini berjaya dimuatkan dari rekod.');
                 } else {
                     console.log("No previous data found, using default data.", result.message);
-                    showToast('Tiada rekod lama ditemui, data lalai digunakan.', true);
+                    if (selectedSchoolKey !== '_NEW_SCHOOL_') {
+                        showToast('Tiada rekod lama ditemui, data lalai digunakan.', true);
+                    }
                 }
             } catch (error) {
                 console.error("Failed to fetch latest data:", error);
@@ -506,7 +418,6 @@
             currentSchoolData = dataToDisplay;
             renderStep('confirm');
             
-            // Now populate the confirmation form with the (potentially updated) data
             const formDiv = document.getElementById('confirmationForm');
             formDiv.innerHTML = `
                 <div>
@@ -584,7 +495,7 @@
             generateBtn.disabled = true;
             generateBtn.textContent = 'Menyimpan...';
 
-            if (WEB_APP_URL === 'PASTE_YOUR_WEB_APP_URL_HERE') {
+            if (WEB_APP_URL === 'PASTE_YOUR_WEB_APP_URL_HERE' || !WEB_APP_URL) {
                 console.error("Sila masukkan URL Web App anda di dalam pembolehubah WEB_APP_URL.");
                 showToast("Ralat: Sila konfigurasikan URL Web App anda.", false);
                 generateBtn.disabled = false;
@@ -707,7 +618,7 @@ NO HP : ${school.pengesah.tel}
             `.trim();
 
             // Prepare data for Google Sheet
-            const sheetData = {
+            const sheetDataToSave = {
                 timestamp: new Date().toISOString(),
                 namaSekolah: school.nama,
                 kodSekolah: school.kod,
@@ -742,7 +653,7 @@ NO HP : ${school.pengesah.tel}
                 laporanPenuh: reportText
             };
 
-            saveDataToSheet(sheetData);
+            saveDataToSheet(sheetDataToSave);
 
             renderStep('output');
             document.getElementById('reportOutput').value = reportText;
@@ -755,9 +666,30 @@ NO HP : ${school.pengesah.tel}
             showToast('Laporan berjaya disalin!');
         };
 
+        const loadInitialData = async () => {
+            try {
+                const response = await fetch(WEB_APP_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                if (data.status === 'success' && data.schools) {
+                    console.log("Successfully fetched school list from Google Sheet.");
+                    Object.assign(schoolData, data.schools);
+                } else {
+                     throw new Error(data.message || "Failed to parse school list.");
+                }
+            } catch (error) {
+                console.error("Could not fetch school list from Google Sheet:", error);
+                showToast("Gagal memuatkan senarai sekolah dari Google Sheet.", false);
+            } finally {
+                renderStep('school');
+            }
+        };
+
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
-            renderStep('school');
+            loadInitialData();
         });
     </script>
 </body>
