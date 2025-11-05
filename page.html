@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Bencana PPD Miri (Dinamik)</title>
+    <!-- Memuatkan Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuatkan Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Menggunakan font Inter sebagai default */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Kelas untuk warna tema seperti dalam gambar */
+        .bg-header-red {
+            background-color: #A91D24; /* Warna merah gelap dari header asal */
+        }
+        .bg-nav-yellow {
+            background-color: #FFF3C4; /* Warna kuning untuk navigasi */
+        }
+        .border-nav-yellow {
+            border-color: #F7D060;
+        }
+        .bg-card-purple {
+            background-color: #E6E0F8; /* Warna ungu lembut untuk kad */
+        }
+        .text-card-purple-dark {
+            color: #4A3C8B;
+        }
+        .bg-card-blue {
+            background-color: #DCEEFB; /* Warna biru lembut untuk kad */
+        }
+        .text-card-blue-dark {
+            color: #1E4A7B;
+        }
+        .bg-card-green {
+            background-color: #D9FADE; /* Warna hijau lembut untuk kad */
+        }
+        .text-card-green-dark {
+            color: #1B5E20;
+        }
+        .bg-card-red {
+            background-color: #FEE2E2; /* Warna merah lembut untuk kad */
+        }
+        .text-card-red-dark {
+            color: #991B1B;
+        }
+        /* Animasi loading sederhana */
+        .loading-pulse {
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+    <!-- Memuatkan Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body class="bg-gray-100">
+
+    <div class="min-h-screen flex flex-col">
+        <!-- Bahagian Header -->
+        <header class="bg-header-red text-white p-4 shadow-md">
+            <div class="container mx-auto flex flex-wrap justify-between items-center gap-2">
+                <!-- Logo dan Tajuk -->
+                <div class="flex items-center space-x-2">
+                    <img src="https://placehold.co/50x50/ffffff/A91D24?text=LOGO" alt="Logo KPM" class="h-12 w-12" onerror="this.src='https://placehold.co/50x50/ffffff/A91D24?text=LOGO'">
+                    <div>
+                        <h2 class="text-sm font-semibold">KEMENTERIAN PENDIDIKAN MALAYSIA</h2>
+                        <h1 class="text-xl font-bold">DASHBOARD BENCANA PPD MIRI</h1>
+                    </div>
+                </div>
+                <!-- Tarikh Kemaskini -->
+                <div class="text-right">
+                    <span class="text-xs text-gray-200 block">Kemaskini Terakhir:</span>
+                    <span id="last-updated" class="text-sm font-semibold">Memuatkan...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Bahagian Navigasi -->
+        <nav class="bg-nav-yellow border-b-2 border-nav-yellow">
+            <div class="container mx-auto px-4">
+                <div class="flex space-x-1">
+                    <a href="#" class="px-4 py-2 bg-white text-blue-700 font-semibold border-b-4 border-blue-700 -mb-px rounded-t-md">LAMAN UTAMA</a>
+                    <a href="#" class="px-4 py-2 text-gray-700 font-medium hover:bg-white/60 rounded-t-md">LAPORAN PPS</a>
+                    <a href="#" class="px-4 py-2 text-gray-700 font-medium hover:bg-white/60 rounded-t-md">LAPORAN SEKOLAH</a>
+                    <a href="#" class="px-4 py-2 text-gray-700 font-medium hover:bg-white/60 rounded-t-md">PPD MIRI ONLY</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Bahagian Isi Kandungan Utama -->
+        <main class="flex-grow container mx-auto p-4">
+            
+            <!-- Kad Bilik Gerakan -->
+            <!-- DIUBAH: Menggunakan flex-col untuk susun maklumat dan mengemaskini data -->
+            <div class="mb-4 bg-red-100 p-4 rounded-lg shadow-md flex flex-col items-center gap-2 text-center border-l-8 border-header-red">
+                <h3 class="text-lg font-bold text-header-red flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation fa-fw"></i>
+                    Bilik Gerakan Pengurusan Bencana Bahagian Miri
+                </h3>
+                
+                <!-- DIKEMASKINI: Nombor telefon dan pautan href -->
+                <a href="tel:085-433203" class="text-2xl font-bold text-red-800 hover:text-blue-700 hover:underline flex items-center gap-2">
+                    <i class="fa-solid fa-phone fa-fw"></i>
+                    085-433203
+                </a>
+                
+                <!-- DITAMBAH: Alamat Bilik Gerakan -->
+                <p class="text-sm text-gray-700 mt-1">
+                    <i class="fa-solid fa-location-dot fa-fw"></i>
+                    Aras 7, Kompleks Islam Sarawak, Jalan Pujut, 98000 Miri, Sarawak.
+                </p>
+            </div>
+
+
+            <!-- Paparan Status Pemuatan -->
+            <div id="loading-indicator" class="hidden mb-4 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded-lg flex items-center gap-3">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>Sedang menyambung ke pangkalan data dan memuatkan data terkini...</span>
+            </div>
+
+            <!-- Paparan Ralat -->
+            <div id="error-indicator" class="hidden mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+                <p><strong>Gagal memuatkan data!</strong> Tidak dapat menyambung ke pangkalan data. Sila semak sambungan anda atau cuba lagi nanti.</p>
+            </div>
+
+            <!-- Grid Utama -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Kolum Kiri: Peta & Status PPS -->
+                <div class="lg:col-span-1 space-y-6">
+                    
+                    <!-- Kad Peta -->
+                    <div class="bg-white p-4 rounded-lg shadow-md">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">Taburan Lokasi</h3>
+                        <!-- Placeholder untuk Peta -->
+                        <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg flex items-center justify-center">
+                            <div class="text-center text-gray-500">
+                                <i class="fa-solid fa-map-location-dot fa-3x"></i>
+                                <p class="mt-2 font-medium">Peta Interaktif Akan Dipaparkan Di Sini</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kad Status PPS -->
+                    <div class="bg-white p-4 rounded-lg shadow-md">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">Status Pusat Pemindahan Sementara (PPS)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <!-- Jumlah -->
+                            <div class="bg-card-blue text-card-blue-dark p-3 rounded-lg text-center">
+                                <span class="block text-sm font-semibold uppercase">Jumlah PPS</span>
+                                <span id="pps-jumlah" class="block text-3xl font-bold">0</span>
+                            </div>
+                            <!-- Buka -->
+                            <div class="bg-card-green text-card-green-dark p-3 rounded-lg text-center">
+                                <span class="block text-sm font-semibold uppercase">Buka</span>
+                                <span id="pps-buka" class="block text-3xl font-bold">0</span>
+                            </div>
+                            <!-- Tutup -->
+                            <div class="bg-card-red text-card-red-dark p-3 rounded-lg text-center">
+                                <span class="block text-sm font-semibold uppercase">Tutup</span>
+                                <span id="pps-tutup" class="block text-3xl font-bold">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kolum Kanan: Statistik Utama & Senarai Sekolah -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Kad Statistik Warga di PPS -->
+                    <div class="bg-white p-4 rounded-lg shadow-md">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">Analisis Warga Pendidikan di PPS</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Statistik Murid -->
+                            <div class="bg-card-purple p-4 rounded-lg">
+                                <h4 class="font-semibold text-card-purple-dark mb-2 flex items-center gap-2">
+                                    <i class="fa-solid fa-users fa-fw w-5 h-5"></i>
+                                    Murid / Pelajar
+                                </h4>
+                                <div class="flex justify-between items-center space-x-4">
+                                    <div class="text-left">
+                                        <span class="text-sm text-card-purple-dark">MASUK</span>
+                                        <span id="murid-masuk" class="block text-2xl font-bold text-card-purple-dark">0</span>
+                                    </div>
+                                    <div class="text-left">
+                                        <span class="text-sm text-card-purple-dark">KELUAR</span>
+                                        <span id="murid-keluar" class="block text-2xl font-bold text-card-purple-dark">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Statistik Guru/AKP -->
+                            <div class="bg-card-purple p-4 rounded-lg">
+                                <h4 class="font-semibold text-card-purple-dark mb-2 flex items-center gap-2">
+                                    <i class="fa-solid fa-briefcase fa-fw w-5 h-5"></i>
+                                    Guru & AKP
+                                </h4>
+                                <div class="flex justify-between items-center space-x-4">
+                                    <div class="text-left">
+                                        <span class="text-sm text-card-purple-dark">MASUK</span>
+                                        <span id="guru-masuk" class="block text-2xl font-bold text-card-purple-dark">0</span>
+                                    </div>
+                                    <div class="text-left">
+                                        <span class="text-sm text-card-purple-dark">KELUAR</span>
+                                        <span id="guru-keluar" class="block text-2xl font-bold text-card-purple-dark">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Statistik Calon SPM -->
+                            <div class="bg-card-purple p-4 rounded-lg">
+                                <h4 class="font-semibold text-card-purple-dark mb-2 flex items-center gap-2">
+                                    <i class="fa-solid fa-file-lines fa-fw w-5 h-5"></i>
+                                    Calon SPM
+                                </h4>
+                                <div class="flex justify-between items-center space-x-4">
+                                    <div class="text-left">
+                                        <span class="text-sm text-card-purple-dark">MASUK</span>
+                                        <span id="spm-masuk" class="block text-2xl font-bold text-card-purple-dark">0</span>
+                                    </div>
+                                    <div class="text-left">
+                                        <span class="text-sm text-card-purple-dark">KELUAR</span>
+                                        <span id="spm-keluar" class="block text-2xl font-bold text-card-purple-dark">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Statistik Calon STPM -->
+                            <div class="bg-card-purple p-4 rounded-lg">
+                                <h4 class="font-semibold text-card-purple-dark mb-2 flex items-center gap-2">
+                                    <i class="fa-solid fa-file-lines fa-fw w-5 h-5"></i>
+                                    Calon STPM
+                                </h4>
+                                <div class="flex justify-between items-center space-x-4">
+                                    <div class="text-left">
+                                        <span class="text-sm text-card-purple-dark">MASUK</span>
+                                        <span id="stpm-masuk" class="block text-2xl font-bold text-card-purple-dark">0</span>
+                                    </div>
+                                    <div class="text-left">
+                                        <span class="text-sm text-card-purple-dark">KELUAR</span>
+                                        <span id="stpm-keluar" class="block text-2xl font-bold text-card-purple-dark">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kad Status Sekolah Terkesan -->
+                    <div class="bg-white p-4 rounded-lg shadow-md">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Status Sekolah Terkesan Banjir</h3>
+                        
+                        <!-- Jumlah Keseluruhan -->
+                        <div class="mb-4">
+                            <div class="flex flex-col items-center justify-center bg-card-blue text-card-blue-dark p-4 rounded-lg">
+                                <span class="text-4xl font-bold flex items-center gap-4">
+                                    <i class="fa-solid fa-school fa-fw w-8 h-8"></i>
+                                    <span id="sekolah-terkesan-jumlah">0</span>
+                                </span>
+                                <span class="font-semibold mt-1">Jumlah Sekolah Terkesan</span>
+                            </div>
+                        </div>
+
+                        <!-- Pecahan mengikut Peringkat -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            
+                            <!-- Sekolah Banjir -->
+                            <div class="bg-card-red p-4 rounded-lg space-y-3">
+                                <h4 class="font-semibold text-card-red-dark text-center text-lg flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-cloud-showers-heavy fa-fw w-5 h-5"></i>
+                                    Sekolah Banjir (<span id="sekolah-banjir-total">0</span>)
+                                </h4>
+                                <!-- Pecahan Sekolah -->
+                                <div class="flex justify-around items-center">
+                                    <div class="text-center">
+                                        <span class="text-sm text-card-red-dark">SEKOLAH RENDAH</span>
+                                        <span id="sekolah-banjir-rendah" class="block text-3xl font-bold text-card-red-dark">0</span>
+                                    </div>
+                                    <div class="text-center">
+                                        <span class="text-sm text-card-red-dark">SEKOLAH MENENGAH</span>
+                                        <span id="sekolah-banjir-menengah" class="block text-3xl font-bold text-card-red-dark">0</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Divider -->
+                                <div class="border-t border-red-300"></div>
+
+                                <!-- Pecahan Calon SPM -->
+                                <div>
+                                    <h5 class="text-sm font-semibold text-card-red-dark text-center mb-2">CALON SPM TERKESAN</h5>
+                                    <div class="flex justify-around items-center">
+                                        <div class="text-center">
+                                            <span class="text-sm text-card-red-dark">LELAKI</span>
+                                            <span id="sekolah-banjir-spm-lelaki" class="block text-3xl font-bold text-card-red-dark">0</span>
+                                        </div>
+                                        <div class="text-center">
+                                            <span class="text-sm text-card-red-dark">PEREMPUAN</span>
+                                            <span id="sekolah-banjir-spm-perempuan" class="block text-3xl font-bold text-card-red-dark">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sekolah Pulih -->
+                            <div class="bg-card-green p-4 rounded-lg">
+                                <h4 class="font-semibold text-card-green-dark mb-3 text-center text-lg flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-shield-halved fa-fw w-5 h-5"></i>
+                                    Sekolah Pulih (<span id="sekolah-pulih-total">0</span>)
+                                </h4>
+                                <div class="flex justify-around items-center pt-3">
+                                    <div class="text-center">
+                                        <span class="text-sm text-card-green-dark">SEKOLAH RENDAH</span>
+                                        <span id="sekolah-pulih-rendah" class="block text-3xl font-bold text-card-green-dark">0</span>
+                                    </div>
+                                    <div class="text-center">
+                                        <span class="text-sm text-card-green-dark">SEKOLAH MENENGAH</span>
+                                        <span id="sekolah-pulih-menengah" class="block text-3xl font-bold text-card-green-dark">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kad Senarai Sekolah Terkesan (Jadual) -->
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <h3 class="text-lg font-semibold text-gray-800 p-4 border-b">Senarai Sekolah Terkesan</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-max text-left">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-sm font-semibold text-gray-600 uppercase">
+                                            <span class="flex items-center gap-2">
+                                                <i class="fa-solid fa-school fa-fw w-4 h-4"></i>
+                                                Nama Sekolah
+                                            </span>
+                                        </th>
+                                        <th class="px-4 py-3 text-sm font-semibold text-gray-600 uppercase">
+                                            <span class="flex items-center gap-2">
+                                                <i class="fa-solid fa-list-check fa-fw w-4 h-4"></i>
+                                                Status
+                                            </span>
+                                        </th>
+                                        <th class="px-4 py-3 text-sm font-semibold text-gray-600 uppercase text-center">
+                                            <span class="flex items-center justify-center gap-2">
+                                                <i class="fa-solid fa-users fa-fw w-4 h-4"></i>
+                                                Murid Terkesan
+                                            </span>
+                                        </th>
+                                        <th class="px-4 py-3 text-sm font-semibold text-gray-600 uppercase text-center">
+                                            <span class="flex items-center justify-center gap-2">
+                                                <i class="fa-solid fa-briefcase fa-fw w-4 h-4"></i>
+                                                Guru Terkesan
+                                            </span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="senarai-sekolah" class="divide-y">
+                                    <!-- Baris data akan dimasukkan oleh JavaScript -->
+                                    <!-- Contoh baris pemuatan -->
+                                    <tr id="table-loading-row">
+                                        <td colspan="4" class="px-4 py-8 text-center text-gray-500">
+                                            <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+                                            Memuatkan senarai sekolah...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Bahagian Footer -->
+        <footer class="bg-gray-800 text-white text-center p-4 mt-8">
+            <p class="text-sm">&copy; 2025 Hakcipta Terpelihara Pejabat Pendidikan Daerah Miri</p>
+        </footer>
+    </div>
+
+    <!-- Firebase SDK -->
+    <!-- DIBETULKAN: type."module" kepada type="module" -->
+    <script type="module">
+        // Import fungsi-fungsi yang diperlukan dari Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, collection, setLogLevel, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Konfigurasi Firebase anda, dimuatkan dari pembolehubah global
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Tunjukkan penunjuk pemuatan
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const errorIndicator = document.getElementById('error-indicator');
+        loadingIndicator.classList.remove('hidden');
+
+        // Fungsi untuk mengemaskini elemen DOM dengan selamat
+        const updateText = (element, value) => {
+            if (element) {
+                element.textContent = value ?? 0; // Guna '0' jika nilai null atau undefined
+            } else {
+                console.warn(`Element not found for value: ${value}`);
+            }
+        };
+
+        // Fungsi untuk memformat tarikh
+        const formatTimestamp = (timestamp) => {
+            if (!timestamp) return 'N/A';
+            const date = timestamp.toDate();
+            return date.toLocaleString('ms-MY', {
+                dateStyle: 'medium',
+                timeStyle: 'short',
+                hour12: true
+            });
+        };
+
+        try {
+            // Inisialisasi Firebase
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+
+            // Aktifkan log debug Firestore
+            setLogLevel('Debug');
+
+            // Log masuk pengguna
+            onAuthStateChanged(auth, async (user) => {
+                if (!user) {
+                    try {
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (authError) {
+                        console.error("Firebase Auth Error:", authError);
+                        showError("Gagal mengesahkan pengguna.");
+                        return;
+                    }
+                }
+                
+                // Setelah disahkan, mula mendengar data
+                if (auth.currentUser) {
+                    console.log("User authenticated:", auth.currentUser.uid);
+                    setupSnapshots(); // Panggil fungsi untuk memuatkan data
+                }
+            });
+
+            // Rujukan ke elemen DOM
+            const elements = {
+                lastUpdated: document.getElementById('last-updated'), // DITAMBAH
+                ppsJumlah: document.getElementById('pps-jumlah'),
+                ppsBuka: document.getElementById('pps-buka'),
+                ppsTutup: document.getElementById('pps-tutup'),
+                muridMasuk: document.getElementById('murid-masuk'),
+                muridKeluar: document.getElementById('murid-keluar'),
+                guruMasuk: document.getElementById('guru-masuk'),
+                guruKeluar: document.getElementById('guru-keluar'),
+                spmMasuk: document.getElementById('spm-masuk'),
+                spmKeluar: document.getElementById('spm-keluar'),
+                stpmMasuk: document.getElementById('stpm-masuk'),
+                stpmKeluar: document.getElementById('stpm-keluar'),
+                sekolahTerkesanJumlah: document.getElementById('sekolah-terkesan-jumlah'),
+                sekolahBanjirTotal: document.getElementById('sekolah-banjir-total'),
+                sekolahBanjirRendah: document.getElementById('sekolah-banjir-rendah'),
+                sekolahBanjirMenengah: document.getElementById('sekolah-banjir-menengah'),
+                sekolahBanjirSpmLelaki: document.getElementById('sekolah-banjir-spm-lelaki'),
+                sekolahBanjirSpmPerempuan: document.getElementById('sekolah-banjir-spm-perempuan'),
+                sekolahPulihTotal: document.getElementById('sekolah-pulih-total'),
+                sekolahPulihRendah: document.getElementById('sekolah-pulih-rendah'),
+                sekolahPulihMenengah: document.getElementById('sekolah-pulih-menengah'),
+                senaraiSekolahTbody: document.getElementById('senarai-sekolah'),
+                tableLoadingRow: document.getElementById('table-loading-row')
+            };
+
+            // Fungsi untuk memulakan listener Firestore
+            function setupSnapshots() {
+                // Tentukan laluan (path) ke dokumen dan koleksi
+                const summaryDocPath = `/artifacts/${appId}/public/data/dashboard/summary`;
+                const schoolsCollectionPath = `/artifacts/${appId}/public/data/affectedSchools`;
+
+                // 1. Dengar perubahan pada dokumen ringkasan (summary)
+                onSnapshot(doc(db, summaryDocPath), (docSnap) => {
+                    loadingIndicator.classList.add('hidden'); // Sembunyi pemuat setelah data pertama diterima
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        
+                        // Kemaskini Tarikh Kemaskini Terakhir
+                        // Anggap 'updatedAt' ialah satu field Timestamp dalam dokumen
+                        updateText(elements.lastUpdated, formatTimestamp(data.updatedAt));
+
+                        // Kemaskini Kad Status PPS
+                        updateText(elements.ppsJumlah, data.pps?.total);
+                        updateText(elements.ppsBuka, data.pps?.open);
+                        updateText(elements.ppsTutup, data.pps?.closed);
+
+                        // Kemaskini Kad Analisis Warga
+                        updateText(elements.muridMasuk, data.people?.murid?.masuk);
+                        updateText(elements.muridKeluar, data.people?.murid?.keluar);
+                        updateText(elements.guruMasuk, data.people?.guru?.masuk);
+                        updateText(elements.guruKeluar, data.people?.guru?.keluar);
+                        updateText(elements.spmMasuk, data.people?.spm?.masuk);
+                        updateText(elements.spmKeluar, data.people?.spm?.keluar);
+                        updateText(elements.stpmMasuk, data.people?.stpm?.masuk);
+                        updateText(elements.stpmKeluar, data.people?.stpm?.keluar);
+
+                        // Kemaskini Kad Status Sekolah
+                        updateText(elements.sekolahTerkesanJumlah, data.schools?.totalAffected);
+                        // Sekolah Banjir
+                        updateText(elements.sekolahBanjirTotal, data.schools?.banjir?.total);
+                        updateText(elements.sekolahBanjirRendah, data.schools?.banjir?.rendah);
+                        updateText(elements.sekolahBanjirMenengah, data.schools?.banjir?.menengah);
+                        updateText(elements.sekolahBanjirSpmLelaki, data.schools?.banjir?.spmLelaki);
+                        updateText(elements.sekolahBanjirSpmPerempuan, data.schools?.banjir?.spmPerempuan);
+                        // Sekolah Pulih
+                        updateText(elements.sekolahPulihTotal, data.schools?.pulih?.total);
+                        updateText(elements.sekolahPulihRendah, data.schools?.pulih?.rendah);
+                        updateText(elements.sekolahPulihMenengah, data.schools?.pulih?.menengah);
+
+                    } else {
+                        console.warn("Dokumen 'summary' tidak wujud!");
+                        updateText(elements.lastUpdated, 'Tiada Data');
+                        // Data tidak wujud, kekalkan nilai '0'
+                    }
+                }, (error) => {
+                    console.error("Error listening to summary doc:", error);
+                    showError("Gagal memuatkan data ringkasan.");
+                });
+
+                // 2. Dengar perubahan pada koleksi sekolah terkesan
+                onSnapshot(collection(db, schoolsCollectionPath), (snapshot) => {
+                    if (snapshot.empty) {
+                        elements.senaraiSekolahTbody.innerHTML = `
+                            <tr>
+                                <td colspan="4" class="px-4 py-8 text-center text-gray-500">
+                                    Tiada data sekolah terkesan ditemui.
+                                </td>
+                            </tr>`;
+                    } else {
+                        // Bersihkan jadual
+                        elements.senaraiSekolahTbody.innerHTML = ''; 
+                        
+                        snapshot.docs.forEach(doc => {
+                            const school = doc.data();
+                            const tr = document.createElement('tr');
+                            tr.className = 'hover:bg-gray-50';
+                            
+                            tr.innerHTML = `
+                                <td class="px-4 py-3 font-medium text-gray-900">${school.name ?? 'N/A'}</td>
+                                <td class="px-4 py-3">${getStatusBadge(school.status ?? 'N/A')}</td>
+                                <td class="px-4 py-3 text-gray-700 text-center">${school.murid ?? 0}</td>
+                                <td class="px-4 py-3 text-gray-700 text-center">${school.guru ?? 0}</td>
+                            `;
+                            elements.senaraiSekolahTbody.appendChild(tr);
+                        });
+                    }
+                }, (error) => {
+                    console.error("Error listening to schools collection:", error);
+                    elements.senaraiSekolahTbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="px-4 py-8 text-center text-red-500">
+                                Gagal memuatkan senarai sekolah.
+                            </td>
+                        </tr>`;
+                });
+            }
+
+            // Fungsi untuk menjana lencana status (badge)
+            function getStatusBadge(status) {
+                const upperStatus = (status || '').toUpperCase();
+                switch (upperStatus) {
+                    case 'BANJIR':
+                        return `<span class="px-3 py-1 rounded-full text-xs font-medium bg-card-red text-card-red-dark">BANJIR</span>`;
+                    case 'PULIH':
+                        return `<span class="px-3 py-1 rounded-full text-xs font-medium bg-card-green text-card-green-dark">PULIH</span>`;
+                    case 'PPS':
+                    case 'DIJADIKAN PPS':
+                        return `<span class="px-3 py-1 rounded-full text-xs font-medium bg-card-blue text-card-blue-dark">DIJADIKAN PPS</span>`;
+                    default:
+                        return `<span class="px-3 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-700">${status}</span>`;
+                }
+            }
+
+            // Fungsi untuk memaparkan ralat
+            function showError(message) {
+                loadingIndicator.classList.add('hidden');
+                errorIndicator.innerHTML = `<p><strong>Gagal!</strong> ${message}</p>`;
+                errorIndicator.classList.remove('hidden');
+            }
+
+        } catch (e) {
+            console.error("Global Error:", e);
+            showError("Berlaku ralat pada aplikasi.");
+        }
+    </script>
+</body>
+</html>
